@@ -11,7 +11,8 @@ This is a special bot for people who learn python at Devman. You can get notific
 pip install -r requirements.txt
 ```
 * Create a bot at telegram channel `@BotFather` 
-* Add file `.env` with variables: 
+* Add file `.env` with variables:
+
 - `DEVMAN_TOKEN` - your devman token that you can get by [link](https://dvmn.org/api/docs/). 
 - `BOT_TOKEN` - token of your bot. You can see that after creating bot in telegram chat. 
 - `TG_CHAT_ID` - your own chat id. Write to `@userinfobot` in telegram. 
