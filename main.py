@@ -62,9 +62,9 @@ def get_attempt_info(url, headers, params):
 def main():
     load_dotenv()
     url = "https://dvmn.org/api/long_polling/"
-    tg_token = os.getenv("TG_TOKEN")
+    devman_token = os.getenv("DEVMAN_TOKEN")
     headers = {
-      "Authorization": "Token {}".format(tg_token)
+      "Authorization": "Token {}".format(devman_token)
     }
     params = {'timestamp': ''}
     get_attempt_info(url, headers, params)
