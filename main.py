@@ -4,6 +4,7 @@ import sys
 from time import sleep
 from dotenv import load_dotenv
 import os
+import logging
 
 
 def write_message(lesson_title, is_negative):
@@ -61,6 +62,8 @@ def get_attempt_info(url, headers, params):
 
 def main():
     load_dotenv()
+    logging.basicConfig(level=logging.DEBUG)
+    logging.info("Bot is running")
     url = "https://dvmn.org/api/long_polling/"
     devman_token = os.getenv("DEVMAN_TOKEN")
     headers = {
