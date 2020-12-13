@@ -1,6 +1,5 @@
 import telegram
 import requests
-import sys
 from time import sleep
 from dotenv import load_dotenv
 import os
@@ -9,9 +8,14 @@ import logging
 
 class MyLogsHandler(logging.Handler):
 
-    def emit(self, record, bot, tg_chat_id):
+    def __init__(self, bot, tg_chat_id):
+        super().__init__()
+        self.bot = bot
+        self.tg_chat_id = tg_chat_id
+
+    def emit(self, record):
         log_entry = self.format(record)
-        bot.send_message(chat_id=tg_chat_id, text=log_entry)
+        self.bot.send_message(chat_id=self.tg_chat_id, text=log_entry)
 
 
 def write_message(lesson_title, is_negative, bot, tg_chat_id):
@@ -70,7 +74,7 @@ def main():
     bot = telegram.Bot(token=os.getenv("BOT_TOKEN"))
     tg_chat_id = os.getenv("TG_CHAT_ID")
     logger = logging.getLogger("Devman Bot logger")
-    logger.setLevel(logging.debug)
+    logger.setLevel(logging.DEBUG)
     logger.addHandler(MyLogsHandler(bot, tg_chat_id))
     logger.info("Bot is running")
 
@@ -80,7 +84,7 @@ def main():
       "Authorization": "Token {}".format(devman_token)
     }
     params = {'timestamp': ''}
-    get_attempt_info(url, headers, params, bor, tg_chat_id, logger)
+    get_attempt_info(url, headers, params, bot, tg_chat_id, logger)
 
 
 if __name__ == '__main__':
