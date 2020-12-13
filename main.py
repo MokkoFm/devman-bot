@@ -7,6 +7,13 @@ import os
 import logging
 
 
+class MyLogsHandler(logging.Handler):
+    
+    def emit(self, record):
+        log_entry = self.format(record)
+        # тут ваша логика
+
+
 def write_message(lesson_title, is_negative):
     bot = telegram.Bot(token=os.getenv("BOT_TOKEN"))
     tg_chat_id = os.getenv("TG_CHAT_ID")
@@ -62,8 +69,11 @@ def get_attempt_info(url, headers, params):
 
 def main():
     load_dotenv()
-    logging.basicConfig(level=logging.DEBUG)
-    logging.info("Bot is running")
+    logger = logging.getLogger("Devman Bot logger")
+    logger.setLevel(logging.debug)
+    logger.addHandler(MyLogsHandler)
+    logger.info("Bot is running")
+
     url = "https://dvmn.org/api/long_polling/"
     devman_token = os.getenv("DEVMAN_TOKEN")
     headers = {
