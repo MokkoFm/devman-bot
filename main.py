@@ -8,15 +8,13 @@ import logging
 
 
 class MyLogsHandler(logging.Handler):
-    
-    def emit(self, record):
+
+    def emit(self, record, bot, tg_chat_id):
         log_entry = self.format(record)
-        # тут ваша логика
+        bot.send_message(chat_id=tg_chat_id, text=log_entry)
 
 
-def write_message(lesson_title, is_negative):
-    bot = telegram.Bot(token=os.getenv("BOT_TOKEN"))
-    tg_chat_id = os.getenv("TG_CHAT_ID")
+def write_message(lesson_title, is_negative, bot, tg_chat_id):
     if is_negative:
         bot.send_message(
             chat_id=tg_chat_id,
@@ -38,7 +36,7 @@ def get_response(url, headers, params):
     return response
 
 
-def get_attempt_info(url, headers, params):
+def get_attempt_info(url, headers, params, bot, tg_chat_id, logger):
     while True:
         try:
             response = get_response(url, headers, params)
@@ -53,7 +51,7 @@ def get_attempt_info(url, headers, params):
                 for attempt in new_attempts:
                     lesson_title = attempt["lesson_title"]
                     is_negative = attempt["is_negative"]
-                    write_message(lesson_title, is_negative)
+                    write_message(lesson_title, is_negative, bot, tg_chat_id)
             elif status == "timeout":
                 timestamp = response_json["timestamp_to_request"]
                 params = {
@@ -62,16 +60,18 @@ def get_attempt_info(url, headers, params):
         except requests.exceptions.ReadTimeout:
             continue
         except requests.ConnectionError:
-            sys.stderr.write("Error with connection\n")
+            logger.error("Error with connection\n")
             sleep(30)
             continue
 
 
 def main():
     load_dotenv()
+    bot = telegram.Bot(token=os.getenv("BOT_TOKEN"))
+    tg_chat_id = os.getenv("TG_CHAT_ID")
     logger = logging.getLogger("Devman Bot logger")
     logger.setLevel(logging.debug)
-    logger.addHandler(MyLogsHandler)
+    logger.addHandler(MyLogsHandler(bot, tg_chat_id))
     logger.info("Bot is running")
 
     url = "https://dvmn.org/api/long_polling/"
@@ -80,7 +80,7 @@ def main():
       "Authorization": "Token {}".format(devman_token)
     }
     params = {'timestamp': ''}
-    get_attempt_info(url, headers, params)
+    get_attempt_info(url, headers, params, bor, tg_chat_id, logger)
 
 
 if __name__ == '__main__':
